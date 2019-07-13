@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Functionator</title>
+
+    <script>
+        
+        // Global variables
+        let my_block;
+        let my_command_list;
+        let my_command_array = [];
+        const my_movement_array = ['Right', 'Left', 'Up', 'Down'];
+        
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', createElements)
+        document.addEventListener('keydown', createCommands);
+
+
+        // Create elements
+        function createElements() {
+            console.log('ready');
+            my_block = document.createElement('div');
+            my_block.textContent = 'Hello World!';
+            document.body.appendChild(my_block);
+            styleElement();
+
+            my_command_list = document.createElement('div');
+            document.body.appendChild(my_command_list);
+        }
+
+        function styleElement() {
+            my_block.style.width = '100px';
+            my_block.style.height = 'auto';
+            my_block.style.backgroundColor = 'red';
+            my_block.style.color = 'white';
+            my_block.style.lineHeight = '100px';
+            my_block.style.textAlign = 'center';
+            my_block.style.position = 'absolute';
+            my_block.style.top = '100px';
+            my_block.style.left = '150px';
+        }
+        
+        
+        // Movement functions
+        function goRight() {
+            let curr_position_left = my_block.offsetLeft;
+            curr_position_left += 50;
+            my_block.style.left = `${curr_position_left}px`
+        }
+
+        function goLeft() {
+            let curr_position_left = my_block.offsetLeft;
+            curr_position_left -= 50;
+            my_block.style.left = `${curr_position_left}px`
+        }
+
+        function goUp() {
+            let curr_position_top = my_block.offsetTop;
+            curr_position_top -= 50;
+            my_block.style.top = `${curr_position_top}px`;
+        }
+
+        function goDown() {
+            let curr_position_top = my_block.offsetTop;
+            curr_position_top += 50;
+            my_block.style.top = `${curr_position_top}px`;
+        }
+        
+        
+        // Pair commands with keypress events
+        function createCommands(event) {
+            event.preventDefault();
+            let key = event.key;
+            console.log(key);
+
+            if (key === 'ArrowUp') command('Up');
+            else if (key === 'ArrowDown') {
+                command('Down');
+            } else if (key === 'ArrowLeft') {
+                command('Left');
+            } else if (key === 'ArrowRight') {
+                command('Right');
+            } else if (key === 'c') {
+                my_block.style.backgroundColor = getRandomHEXColor();
+                
+            // Press Enter to execute command chain
+            } else if (key === 'Enter') {
+                moveElement()
+            } else if (key === 'r') {
+                let random_movement = my_movement_array[Math.floor(Math.random() * my_movement_array.length)];
+                command(random_movement);
+            }
+        }
+        
+        // Random color for element
+        function getRandomHEXColor() {
+            let random_HEX = Math.random().toString(16).substr(-6);
+            return `#${random_HEX}`;
+        }
+
+        // Render command cain and add to command array
+        function command(value) {
+            console.log(my_command_array)
+            let span = document.createElement('span');
+            span.textContent = `+${value}`;
+            span.style.padding = '10px';
+            span.style.border = '1px solid #ddd';
+            my_command_list.appendChild(span);
+            my_command_array.push(span);
+
+            // Hover effect for command chain
+            span.addEventListener('mouseover', function() {
+                this.style.backgroundColor = 'red';
+                this.style.color = 'white';
+            })
+
+            span.addEventListener('mouseout', function() {
+                this.style.backgroundColor = 'white';
+                this.style.color = 'black';
+            })
+            
+            // Remove command from command chain
+            span.addEventListener('click', function() {
+                let command_index = my_command_array.indexOf(this);
+                let remove_command = my_command_array.splice(command_index, 1);
+                my_command_list.removeChild(this);
+            })
+        }
+
+        
+        // Execute command chain
+        function moveElement() {
+            if (my_command_array.length > 0) {
+                let cur_position = my_block.getBoundingClientRect();
+                let el = my_command_array.shift();
+                let item = el.textContent.replace('+', '');
+                my_command_list.removeChild(el);
+                my_block.innerHTML = `Move ${item}`;
+
+                if (item === 'Left') {
+                    my_block.style.left = `${cur_position.left - cur_position.width}px`;
+                } else if (item === 'Right') {
+                    my_block.style.left = `${cur_position.left + cur_position.width}px`;
+                } else if (item === 'Up') {
+                    my_block.style.top = `${cur_position.top - cur_position.height}px`;
+                } else if (item === 'Down') {
+                    my_block.style.top = `${cur_position.top + cur_position.height}px`;
+                }
+                setTimeout(moveElement, 400);
+            } else {
+                my_block.innerHTML = 'Set Path';
+                return;
+            }
+        }
+ 
+    </script>
+</head>
+
+<body>
+
+</body></html>
